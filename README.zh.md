@@ -25,6 +25,8 @@ npm install @libai168/dsh-tool-dockerhub
 
 在 Docker Hub 账号设置中创建 personal access token。token 会换取短期 JWT 并仅保存在内存中，任何工具都不会返回它。
 
+`baseUrl` 可选，但必须是带 hostname 的绝对 `http://` 或 `https://` URL。允许反向代理路径前缀，末尾斜杠会被规范化；禁止 URL 用户名、密码、查询字符串和 fragment。每次请求前都会校验最终 host：localhost 名称、环回、私有、链路本地、共享地址/CGNAT、组播，以及全部 IANA 特殊用途地址段（保留、文档、基准测试、`2001::/23` IETF 协议分配段、已废弃的站点本地、SRv6 SID、AS112，以及 IPv4-mapped/NAT64 形式）都会被拒绝。普通域名必须解析到全部允许的公共地址；DNS 失败、空结果或安全/不安全混合结果都会在调用 `fetch` 前 fail closed。
+
 ## 工具
 
 全部为只读工具。

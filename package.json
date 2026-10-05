@@ -1,7 +1,7 @@
 {
   "name": "@libai168/dsh-tool-dockerhub",
   "description": "Docker Hub read-only tools for DeepSeek Harness: authentication, repository search, repositories, tags, and rate limits",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",

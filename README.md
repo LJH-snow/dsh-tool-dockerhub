@@ -25,6 +25,8 @@ Requires `@deepseek-ai/cordis` (^4.0.1) and `@deepseek-ai/dsh-tools` (^0.1.0-rc.
 
 Create a personal access token in Docker Hub account settings. The token is exchanged for a short-lived JWT that stays in memory; it is never returned by any tool.
 
+`baseUrl` is optional and must be an absolute `http://` or `https://` URL with a hostname. A reverse-proxy path prefix is allowed and trailing slashes are normalized. URL credentials, query strings, and fragments are rejected. Before every request, the final host is checked: localhost names, loopback/private/link-local/shared (CGNAT), multicast, and every IANA special-purpose block (reserved, documentation, benchmarking, the `2001::/23` IETF protocol assignments prefix, deprecated site-local, SRv6 SIDs, AS112, and IPv4-mapped/NAT64 forms) are blocked. Ordinary hostnames must resolve to only permitted public addresses; DNS failures, empty results, or mixed safe/unsafe results fail closed before `fetch` is called.
+
 ## Tools
 
 All tools are read-only.

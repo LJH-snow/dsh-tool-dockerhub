@@ -1,11 +1,15 @@
 /** Docker Hub API client with optional PAT authentication and injected fetch. */
 
+import { assertSafeUrl, normalizeBaseUrl, type LookupImpl } from './url-security.js'
+
 export interface DockerHubClientOptions {
   username?: string
   personalAccessToken?: string
   baseUrl?: string
   timeoutMs?: number
   fetchImpl?: typeof fetch
+  /** Test-only DNS resolver injection; production callers should omit it. */
+  lookupImpl?: LookupImpl
 }
 
 export class DockerHubError extends Error {
@@ -167,14 +171,20 @@ export class DockerHubClient {
   private readonly baseUrl: string
   private readonly timeoutMs: number
   private readonly fetchImpl: typeof fetch
+  private readonly lookupImpl: LookupImpl | undefined
   private authToken = ''
 
   constructor(options: DockerHubClientOptions = {}) {
     this.username = options.username ?? ''
     this.personalAccessToken = options.personalAccessToken ?? ''
-    this.baseUrl = (options.baseUrl ?? 'https://hub.docker.com').replace(/\/+$/, '')
+    try {
+      this.baseUrl = normalizeBaseUrl(options.baseUrl)
+    } catch (error) {
+      throw new DockerHubError(error instanceof Error ? error.message : 'Docker Hub baseUrl is invalid.', 400, 'invalid_base_url')
+    }
     this.timeoutMs = options.timeoutMs ?? 15000
     this.fetchImpl = options.fetchImpl ?? globalThis.fetch
+    this.lookupImpl = options.lookupImpl
   }
 
   hasCredentials(): boolean {
@@ -213,6 +223,11 @@ export class DockerHubClient {
     const combined = options.signal ? AbortSignal.any([options.signal, controller.signal]) : controller.signal
     const timer = this.timeoutMs > 0 ? setTimeout(() => controller.abort(), this.timeoutMs) : undefined
     try {
+      try {
+        await assertSafeUrl(url, this.lookupImpl)
+      } catch {
+        throw new DockerHubError('Docker Hub request URL was rejected by host safety policy.', 400, 'unsafe_url')
+      }
       const response = await this.fetchImpl(url.toString(), {
         method,
         headers,
