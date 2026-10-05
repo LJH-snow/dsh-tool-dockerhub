@@ -52,7 +52,7 @@ describe('DockerHubClient', () => {
 
   it('searches public repositories without credentials', async () => {
     const fetchImpl = vi.fn(async () => jsonResponse({ count: 1, next: '', previous: '', results: [{ name: 'nginx', namespace: 'library', description: 'Official nginx', pull_count: 100, star_count: 50, is_official: true, is_automated: false }] }))
-    const result = await new DockerHubClient({ fetchImpl }).searchRepositories({ query: 'nginx' })
+    const result = await new DockerHubClient({ lookupImpl: stablePublicLookup, fetchImpl }).searchRepositories({ query: 'nginx' })
     expect(result.items[0]).toMatchObject({ name: 'nginx', namespace: 'library', isOfficial: true, isAutomated: false })
     const [, init] = fetchImpl.mock.calls[0] as [string, RequestInit]
     expect((init.headers as Record<string, string>).authorization).toBeUndefined()
