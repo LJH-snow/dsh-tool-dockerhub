@@ -104,6 +104,9 @@ describe('DockerHubClient', () => {
   it('rejects literal localhost, loopback, private, and reserved addresses before fetch', async () => {
     const blockedBaseUrls = [
       'http://localhost',
+      'http://service.localhost',
+      'http://localhost.localdomain',
+      'http://service.local',
       'http://127.0.0.1',
       'http://[::1]',
       'http://0.0.0.0',
